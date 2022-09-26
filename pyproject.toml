@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "mapsec"
+version = "0.1.0"
+description = "A one-stop tool for scanning your IoT devices connected on your network"
+authors = ["Anuran Roy <76481787+anuran-roy@users.noreply.github.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.83.0"
+uvicorn = "^0.18.3"
+gunicorn = "^20.1.0"
+orjson = "^3.8.0"
+tinydb = "^4.7.0"
+PyQRCode = "^1.2.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.1.3"
+black = "^22.8.0"
+flake8 = "^5.0.4"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
