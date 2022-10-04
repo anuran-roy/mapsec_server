@@ -1,17 +1,20 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from typing import Any, Optional, Tuple, List, Dict, Union
 from models.models import ReportModel, ScanRequestModel
 import time
+from db.db import get_db
+from tinydb import TinyDB, Query
+import uuid
 
 router = APIRouter(prefix="/scanner", tags=["Vulnerability Scanner"])
 
 
 @router.post("/new", response_model=ReportModel)
-async def scan(details: ScanRequestModel) -> Any:
-    # print(response)
-    print(f"Received request details = {dict(details)}")
-    time.sleep(2.5)
-    return {
+async def scan(details: ScanRequestModel, db: TinyDB = Depends(get_db)) -> Any:
+    new_id = str(uuid.uuid4())
+    request_details = dict(details)
+    print(f"Received request details = {request_details}")
+    response = {
         "report": {
             "critical": {
                 "count": 1,
@@ -44,10 +47,10 @@ async def scan(details: ScanRequestModel) -> Any:
                 ],
             },
         },
-        "id": 1,
-        "name": "Custom Scan 1",
+        "id": new_id,
+        "name": f"Custom Scan {new_id}",
         "description": "Untitled Scan - Scanned on 2022-09-25",
-        "timestamp": "2022-09-25T20:01:14.486Z",
+        "timestamp": request_details.get("timestamp", "2022-09-25T20:01:14.486Z"),
         "target_device": {
             "name": "NA",
             "platform": "Android",
@@ -61,27 +64,31 @@ async def scan(details: ScanRequestModel) -> Any:
         },
     }
 
-
-@router.get("/peek/{scan_id}")
-async def peek_log(scan_id: int):  # , db: TinyDB = Depends(get_db)):
-    response = {
-        "report": {
-            "critical": 1,
-            "warning": 1,
-            "info": 1,
-        },
-        "id": scan_id,
-        "name": f"Custom Scan {scan_id}",
-        "description": "Untitled Scan - Scanned on 2022-09-25",
-        "timestamp": "2022-09-25T20:01:14.486Z",
-    }
-    print(response)
+    db.insert(response)
+    time.sleep(2.5)
+    print(len(db))
     return response
 
 
+@router.get("/get_count")
+async def get_count(db: TinyDB = Depends(get_db)) -> Any:
+    # return {"count": db.count()}
+    ids = [doc["id"] for doc in db]
+    return {"count": len(ids), "ids": ids}
+
+
+@router.get("/peek/{scan_id}")
+async def peek_log(scan_id: str, db: TinyDB = Depends(get_db)):
+    queryset = db.search(Query().id == scan_id)
+    response = dict(queryset[0]) if len(queryset) > 0 else {"report": {"critical": 1, "warning": 1, "info": 1,}, "id": scan_id, "name": f"Custom Scan {scan_id}", "description": "Untitled Scan - Scanned on 2022-09-25", "timestamp": "2022-09-25T20:01:14.486Z"}
+    processed_response = response | {"report": {i: response["report"][i]["count"] for i in response["report"].keys()}} if len(queryset) > 0 else response
+    # print(response)
+    return processed_response
+
+
 @router.get("/info/{scan_id}")
-async def get_log(scan_id: int):  # , db: TinyDB = Depends(get_db)):
-    response = {
+async def get_log(scan_id: str, db: TinyDB = Depends(get_db)):
+    default_response = {
         "report": {
             "critical": {
                 "count": 1,
@@ -130,5 +137,8 @@ async def get_log(scan_id: int):  # , db: TinyDB = Depends(get_db)):
             },
         },
     }
+    
+    queryset = db.search(Query().id == scan_id)
+    response = queryset[0] if len(queryset) > 0 else default_response
     print(response)
     return response
