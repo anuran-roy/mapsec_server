@@ -9,22 +9,18 @@ router = APIRouter(prefix="/credentials", tags=["Credentials Scanner"])
 
 
 @router.post("/add", status_code=status.HTTP_201_CREATED)
-async def add_credential(
-    credential: CredentialModel,
-    db: TinyDB = Depends(get_db)
-):
+async def add_credential(credential: CredentialModel, db: TinyDB = Depends(get_db)):
     cred_table = db.table("credentials")
 
     credQuery = Query()
     queryset = cred_table.search(
-        (credQuery.credential == credential.credential) &
-        (credQuery.credential_type == credential.credential_type)
+        (credQuery.credential == credential.credential)
+        & (credQuery.credential_type == credential.credential_type)
     )
 
     if len(queryset) > 0:
         return HTTPException(
-            status.HTTP_406_NOT_ACCEPTABLE,
-            detail="Entry already exists!"
+            status.HTTP_406_NOT_ACCEPTABLE, detail="Entry already exists!"
         )
 
     cred = dict({**dict(credential), "id": str(uuid.uuid4())})
@@ -35,8 +31,7 @@ async def add_credential(
 
 @router.get("/", response_model=List[Dict[str, Any]])
 async def get_credentials(
-    credType: Optional[str] = "all",
-    db: TinyDB = Depends(get_db)
+    credType: Optional[str] = "all", db: TinyDB = Depends(get_db)
 ):
     cred_table = db.table("credentials")
     if credType == "all":

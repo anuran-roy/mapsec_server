@@ -25,5 +25,5 @@ def credential_leak_check(credential: str, check_type: Optional[str] = "auto") -
     response = requests.request("GET", url, headers=headers, params=query_string)
 
     print(response.text)
-    
+
     return eval(response.txt)
