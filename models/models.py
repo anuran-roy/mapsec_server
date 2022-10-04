@@ -18,3 +18,10 @@ class ScanRequestModel(BaseModel):
     description: Optional[str]
     timestamp: Optional[str]
     target_device: Optional[Dict[str, Any]]
+
+
+class CredentialModel(BaseModel):
+    credential: str
+    credential_type: str  # ["Others", "Email", "Username", "Phone"]
+    leaked: bool
+    leaked_date: Optional[str]
