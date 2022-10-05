@@ -50,16 +50,17 @@ async def sync_data_from_file(
         return HTTPException(status=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Something broke inside :( Check server logs for more details")
 
 
-@router.get("/to_file", status_code=status.HTTP_200_OK)
-async def export_file(db: TinyDB = Depends(get_db), log_db: TinyDB = Depends(get_log_db)):
-    def iter_file():
-        with open(str(BASE_DIR / "db.json"), "rb") as out_file:
-            yield from out_file
+# @router.get("/to_file", status_code=status.HTTP_200_OK)
+# async def export_file(db: TinyDB = Depends(get_db), log_db: TinyDB = Depends(get_log_db)):
+#     def iter_file():
+#         with open(str(BASE_DIR / "db.json"), "rb") as out_file:
+#             yield from out_file
     
-    return StreamingResponse(iter_file(), media_type="application/json")
+#     return StreamingResponse(iter_file(), media_type="application/json")
 
 
 # NOTE: The below endpoint does the exact same thing
-# @router.get("/to_file_2", status_code=status.HTTP_200_OK, response_class=FileResponse)
-# async def export_file(db: TinyDB = Depends(get_db), log_db: TinyDB = Depends(get_log_db)):
-#     return FileResponse(str(BASE_DIR / "db.json"))
+@router.get("/to_file", status_code=status.HTTP_200_OK, response_class=FileResponse)
+async def export_file(db: TinyDB = Depends(get_db), log_db: TinyDB = Depends(get_log_db)):
+    headers = {'Access-Control-Expose-Headers': 'Content-Disposition'}
+    return FileResponse(str(BASE_DIR / "db.json"), filename="db.json", headers=headers)
