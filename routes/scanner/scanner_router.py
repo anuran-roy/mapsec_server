@@ -5,6 +5,7 @@ import time
 from db.db import get_db
 from tinydb import TinyDB, Query
 import uuid
+import platform
 
 router = APIRouter(prefix="/scanner", tags=["Vulnerability Scanner"])
 
@@ -55,6 +56,7 @@ async def scan(details: ScanRequestModel, db: TinyDB = Depends(get_db)) -> Any:
         },
         "id": new_id,
         "name": f"Custom Scan {new_id}",
+        "device": platform.node(),
         "description": "Untitled Scan - Scanned on 2022-09-25",
         "timestamp": request_details.get("timestamp", "2022-09-25T20:01:14.486Z"),
         "target_device": {
