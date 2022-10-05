@@ -2,3 +2,4 @@
 **/venv/**
 **/db.json
 **/*dummy*
+**/sync_data
