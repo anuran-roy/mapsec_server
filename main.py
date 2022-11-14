@@ -1,11 +1,11 @@
-from config import BASE_DIR
 import sys
+
+from config import BASE_DIR
 
 sys.path.append(str(BASE_DIR))
 
-from fastapi import FastAPI, APIRouter
+from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
 from routes.api_router import router as api_router
 
 app = FastAPI(

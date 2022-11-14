@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Depends, status, HTTPException
-from typing import Any, Optional, List, Dict
-from db.db import get_db
-from models.models import CredentialModel
 import uuid
-from tinydb import TinyDB, Query
+from typing import Any, Dict, List, Optional
+
+from tinydb import Query, TinyDB
+
+from db.db import get_db
+from fastapi import APIRouter, Depends, HTTPException, status
+from models.models import CredentialModel
 
 router = APIRouter(prefix="/credentials", tags=["Credentials Scanner"])
 

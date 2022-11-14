@@ -1,6 +1,8 @@
-from tinydb import TinyDB
-from main import BASE_DIR
 import os
+
+from tinydb import TinyDB
+
+from main import BASE_DIR
 
 db_loc = str(BASE_DIR / "db.json")
 log_db_loc = str(BASE_DIR / "sync_data" / "log_db.json")

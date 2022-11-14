@@ -1,5 +1,6 @@
+from typing import Any, Optional
+
 import requests
-from typing import Optional, Any
 
 
 def credential_leak_check(credential: str, check_type: Optional[str] = "auto") -> Any:
