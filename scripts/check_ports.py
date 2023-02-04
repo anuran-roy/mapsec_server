@@ -5,11 +5,19 @@ import nmap
 import pandas as pd
 
 
-def get_devices_in_network():
-    """Get the devices connected tothe gateway using arp table."""
-    df_dict = {"name": [], "ipv4": [], "ipv6": [], "type": [], "interface": []}
-    op = subprocess.getoutput(f"arp -a | grep 192.168.").split("\n")
+def get_arp(regex: str = "") -> list:
+    final_command = "arp -a"
+    if len(regex) > 0:
+        final_command += f" | grep {regex}"
+    return subprocess.getoutput(final_command).split("\n")
 
+
+def get_devices_in_network(include_self: bool = False):
+    """Get the devices connected to the gateway using arp table."""
+    df_dict = {"name": [], "ipv4": [], "ipv6": [], "type": [], "interface": []}
+    op = get_arp(regex="wlp4s0")
+    gateway_interface = ""
+    self_device: str = subprocess.getoutput("hostname -I | awk '{print $1}'")
     for i in op:
         line = i.split()
         nm = line[0] if line[0] != "?" else "Unknown Device"
@@ -25,13 +33,21 @@ def get_devices_in_network():
             df_dict["type"].append(tp)
             df_dict["interface"].append(interface)
 
-    return df_dict
+        if nm == "_gateway":
+            gateway_interface = interface
+
+    return df_dict, gateway_interface
 
 
-def scan_ports():
+def scan_ports(include_self: bool = False):
     nm = nmap.PortScanner()
 
-    devices_to_scan = get_devices_in_network()
+    potential_devices_to_scan, gateway_interface = get_devices_in_network(
+        include_self=include_self
+    )
+    devices_df = pd.DataFrame(potential_devices_to_scan)
+
+    devices_to_scan = potential_devices_to_scan
     # print(devices_to_scan)
     exposed_ports_dict = {}
 

@@ -1,5 +1,6 @@
 import sys
-
+import os
+from dotenv import load_dotenv
 from config import BASE_DIR
 
 sys.path.append(str(BASE_DIR))
@@ -8,6 +9,7 @@ from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes.api_router import router as api_router
 
+load_dotenv()
 app = FastAPI(
     title="MapSec API Server",
     description="A one-stop tool for scanning your IoT devices connected on your network",

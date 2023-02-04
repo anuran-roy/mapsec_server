@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Literal, Optional
 
 from pydantic import BaseModel
 
@@ -23,6 +23,6 @@ class ScanRequestModel(BaseModel):
 
 class CredentialModel(BaseModel):
     credential: str
-    credential_type: str  # ["Others", "Email", "Username", "Phone"]
+    credential_type: Literal["others", "email", "username", "phone", "domains"]
     leaked: bool
     leaked_date: Optional[str]

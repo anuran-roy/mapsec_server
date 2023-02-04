@@ -12,10 +12,10 @@ from fastapi import APIRouter, Depends
 from models.models import ReportModel, ScanRequestModel
 from scripts.check_ports import scan_ports
 
-router = APIRouter(prefix="/scanner", tags=["Vulnerability Scanner"])
+router = APIRouter(prefix="/vulnerabilities", tags=["Vulnerability Scanner"])
 
 
-@router.post("/new", response_model=ReportModel)
+@router.post("/scan", response_model=ReportModel)
 async def scan(details: ScanRequestModel, db: TinyDB = Depends(get_db)) -> Any:
     scan_table = db.table("scans")
     new_id = str(uuid.uuid4())
@@ -70,7 +70,10 @@ async def scan(details: ScanRequestModel, db: TinyDB = Depends(get_db)) -> Any:
 
     ports_report = scan_ports()
     print(f"{ports_report = }")
-    ct = sum([len(list(ports_report[list(ports_report.keys())[0]]))])
+    ct = 0
+    if len(list(ports_report.keys())) > 0:
+        ct = sum([len(list(ports_report[list(ports_report.keys())[0]]))])
+    # ct = 2
     response["report"]["warning"] = {"count": ct, "details": []}
 
     for i in ports_report:
