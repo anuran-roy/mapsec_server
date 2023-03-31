@@ -20,7 +20,7 @@ fastapi-pagination = "^0.10.0"
 python-nmap = "^0.7.1"
 python-arptable = "^0.0.2"
 celery = "^5.2.7"
-redis = "^4.4.0"
+redis = "^4.4.4"
 python-dotenv = "^0.21.1"
 aiohttp = "^3.8.3"
 
